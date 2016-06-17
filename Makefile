@@ -1,29 +1,27 @@
 PROJECT=antiscroll
 
-all: check build
+all: node_modules check build
 
 check: lint
 
 lint:
-	jshint antiscroll.js
+	node_modules/.bin/jshint antiscroll.js
 
-build: build/build.js build/build.css
+build: clean build/antiscroll.js build/antiscroll.css
 
-build/build.js: node_modules antiscroll.js
+build/antiscroll.js: antiscroll.js
 	mkdir -p build
-	browserify \
-		--require component-event:event \
-		--require component-query:query \
-		--require ./antiscroll.js:$(PROJECT) \
+	node_modules/.bin/browserify \
+		./antiscroll.js \
+		--no-bundle-external \
+		--transform stringify \
 		--outfile $@
 
-build/build.css: antiscroll.css
+build/antiscroll.css: antiscroll.css
 	cp $< $@
 
 node_modules: package.json
 	npm install
 
 clean:
-	rm -fr build node_modules
-
-.PHONY: clean lint check all build
+	rm -rf build

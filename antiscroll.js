@@ -1,9 +1,17 @@
-var bind = require('bind');
-var classes = require('classes');
-var css = require('css');
-var events = require('events');
-var q = require('query');
-var inherit = require('inherit');
+var bind = require('component-bind');
+var classes = require('component-classes');
+var css = require('code42day-css');
+var events = require('component-events');
+var q = require('component-query');
+var inherit = require('component-inherit');
+
+var HTML_TEMPLATE = [
+  '<div id="antiscroll-size-detection"',
+  '  class="antiscroll-inner"',
+  '  style="width:50px;height:50px;overflow-y:scroll;position:absolute;top:-200px;left:-200px;">',
+  '  <div style="height:100px;width:100%"/>',
+  '</div>',
+].join('\n');
 
 module.exports = Antiscroll;
 
@@ -24,9 +32,10 @@ function Antiscroll (el, opts) {
   this.y = (false !== this.options.y) || this.options.forceVertical;
   this.autoHide = false !== this.options.autoHide;
   this.padding = undefined === this.options.padding ? 2 : this.options.padding;
+  this.topOffset = undefined === this.options.topOffset ? 0 : this.options.topOffset;
+  this.bottomOffset = undefined === this.options.bottomOffset ? 0 : this.options.bottomOffset;
 
   this.inner = q('.antiscroll-inner', this.el);
-
   css(this.inner, {
     width:  this.inner.offsetWidth + (this.y ? scrollbarSize() : 0),
     height: this.inner.offsetHeight + (this.x ? scrollbarSize() : 0)
@@ -374,16 +383,16 @@ inherit(Scrollbar.Vertical, Scrollbar);
  */
 
 Scrollbar.Vertical.prototype.update = function () {
-  var paneHeight = this.pane.el.offsetHeight,
+  var paneHeight = this.pane.el.offsetHeight - this.pane.topOffset - this.pane.bottomOffset,
     trackHeight = paneHeight - this.pane.padding * 2,
     scrollHeight = this.pane.inner.scrollHeight;
 
-  var scrollbarHeight = trackHeight * paneHeight / scrollHeight;
+  var scrollbarHeight = trackHeight * paneHeight / (scrollHeight - this.pane.topOffset - this.pane.bottomOffset);
   scrollbarHeight = scrollbarHeight < 20 ? 20 : scrollbarHeight;
 
-  var topPos = trackHeight * this.pane.inner.scrollTop / scrollHeight;
+  var topPos = trackHeight * this.pane.inner.scrollTop / (scrollHeight - this.pane.topOffset - this.pane.bottomOffset) + this.pane.topOffset;
 
-  if((topPos + scrollbarHeight) > trackHeight) {
+  if((topPos + scrollbarHeight) > this.pane.el.offsetHeight) {
     var diff = (topPos + scrollbarHeight) - trackHeight;
     topPos = topPos - diff - 3;
   }
@@ -442,17 +451,12 @@ var size;
 
 function scrollbarSize () {
   if (size === undefined) {
-    document.body.insertAdjacentHTML('beforeend', require('./template.html'));
+    document.body.insertAdjacentHTML('beforeend', HTML_TEMPLATE);
 
     var div = q('#antiscroll-size-detection');
     size = div.offsetWidth - div.clientWidth;
 
     document.body.removeChild(div);
-
-    if (size === 0) {
-      // HACK: assume it's a floating scrollbars browser like FF on MacOS Lion
-      size = 14;
-    }
   }
 
   return size;
