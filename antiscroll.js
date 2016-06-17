@@ -1,9 +1,9 @@
-var bind = require('bind');
-var classes = require('classes');
-var css = require('css');
-var events = require('events');
-var q = require('query');
-var inherit = require('inherit');
+var bind = require('component-bind');
+var classes = require('component-classes');
+var css = require('code42day-css');
+var events = require('component-events');
+var q = require('component-query');
+var inherit = require('component-inherit');
 
 module.exports = Antiscroll;
 
