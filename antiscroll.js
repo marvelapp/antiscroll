@@ -5,6 +5,14 @@ var events = require('component-events');
 var q = require('component-query');
 var inherit = require('component-inherit');
 
+var HTML_TEMPLATE = [
+  '<div id="antiscroll-size-detection"',
+  '  class="antiscroll-inner"',
+  '  style="width:50px;height:50px;overflow-y:scroll;position:absolute;top:-200px;left:-200px;">',
+  '  <div style="height:100px;width:100%"/>',
+  '</div>',
+].join('\n');
+
 module.exports = Antiscroll;
 
 /**
@@ -443,7 +451,7 @@ var size;
 
 function scrollbarSize () {
   if (size === undefined) {
-    document.body.insertAdjacentHTML('beforeend', require('./template.html'));
+    document.body.insertAdjacentHTML('beforeend', HTML_TEMPLATE);
 
     var div = q('#antiscroll-size-detection');
     size = div.offsetWidth - div.clientWidth;
