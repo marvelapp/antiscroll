@@ -40,7 +40,9 @@
     "url": "https://github.com/code42day/antiscroll/issues"
   },
   "devDependencies": {
+    "browserify": "^13.0.1",
     "component-event": "^0.1.4",
+    "jshint": "^2.9.2",
     "stringify": "^3.1.0"
   }
 }
